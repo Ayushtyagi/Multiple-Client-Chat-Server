@@ -1,0 +1,10 @@
+
+Nov 26 09:36:25.022|30371||Socket created-->  Socket created
+
+Nov 26 09:36:25.026|30371||Bind success-->  Bind success
+
+Nov 26 09:36:25.029|30371||Server waiting for connections-->  Server waiting for connections
+
+Nov 26 09:36:31.711|30371||Entered into handle_signal function-->  Entered into handle_signal function
+
+Nov 26 09:36:31.714|30371||Exit from handle_signal function-->  Exit from handle_signal function

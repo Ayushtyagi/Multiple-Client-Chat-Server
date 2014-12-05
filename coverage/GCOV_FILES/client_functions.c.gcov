@@ -1,0 +1,257 @@
+        -:    0:Source:../src/client_functions.c
+        -:    0:Graph:client_functions.gcno
+        -:    0:Data:client_functions.gcda
+        -:    0:Runs:1
+        -:    0:Programs:4
+        -:    1:/***********************************************************************************
+        -:    2: * FILE NAME	: server_functions.c
+        -:    3: 
+        -:    4: * DESCRIPTION 	: This file contains functions which implement all the functionalities 
+        -:    5:		  of the client.
+        -:    6: 
+        -:    7:        DATE            NAME            REFERENCE               REASON
+        -:    8:      23/Nov/14     Nikhil Fadnis       	                Project 
+        -:    9: 
+        -:   10: * Copyright 2014 , Aricent Technologies (Holdings) Ltd
+        -:   11:***********************************************************************************/
+        -:   12:
+        -:   13:#include "client_header.h"
+        -:   14:#include "logger.h"
+        -:   15:
+        -:   16:/***********************************************************************************
+        -:   17: * FUNCTION NAME : handle_signal
+        -:   18: 
+        -:   19: * DESCRIPTION 	 : Handles the SIGTSTP and SIGINT signals
+        -:   20: 
+        -:   21: * RETURNS 	 : void
+        -:   22:
+        -:   23: * Copyright 2014 , Aricent Technologies (Holdings) Ltd
+        -:   24:***********************************************************************************/
+        -:   25:
+        -:   26:void handle_signal(int signal)
+function handle_signal called 0 returned 0% blocks executed 0%
+    #####:   27:{
+    #####:   28:	LOGGER(LOG_CRITICAL,"Entered into handle_signal function");
+    #####:   29:	int ret = 0;
+    #####:   30:	char* msg = "Type in 'quit' to exit\n\n";
+    #####:   31:	ret = write(1, msg, strlen(msg));
+    #####:   32:	if(-1 == ret)
+        -:   33:	{
+    #####:   34:		ERROR_LOGGER(LOG_CRITICAL,"Write error");
+    #####:   35:		perror("Write error");
+    #####:   36:		exit(EXIT_FAILURE);
+        -:   37:	}
+    #####:   38:	LOGGER(LOG_CRITICAL,"Exit from handle_signal function");
+        -:   39:}
+        -:   40:
+        -:   41:/***********************************************************************************
+        -:   42: * FUNCTION NAME : send_flag
+        -:   43: 
+        -:   44: * DESCRIPTION 	 : Sends a flag/integer to the client.
+        -:   45:
+        -:   46: * RETURNS 	 : void
+        -:   47:
+        -:   48: * Copyright 2014 , Aricent Technologies (Holdings) Ltd
+        -:   49:***********************************************************************************/
+        -:   50:
+        -:   51:void send_flag(int sd, int flag)
+function send_flag called 0 returned 0% blocks executed 0%
+    #####:   52:{
+    #####:   53:	LOGGER(LOG_CRITICAL,"Entered into send_flag function");
+    #####:   54:        int iflag = 0, ret = 0;
+    #####:   55:        iflag = htons(flag);
+    #####:   56:        ret = write(sd, &iflag, sizeof(int));
+    #####:   57:        if(-1 == ret) 
+        -:   58:        {   
+    #####:   59:		ERROR_LOGGER(LOG_CRITICAL,"Write error");
+    #####:   60:                perror("Write error");
+    #####:   61:                exit(EXIT_FAILURE);
+        -:   62:        }
+    #####:   63:	LOGGER(LOG_CRITICAL,"Exit from send_flag function");   
+        -:   64:}
+        -:   65:
+        -:   66:/***********************************************************************************
+        -:   67: * FUNCTION NAME : receive_flag
+        -:   68: 
+        -:   69: * DESCRIPTION 	 : Receives a flag/integer from the client.
+        -:   70:
+        -:   71: * RETURNS 	 : void
+        -:   72:
+        -:   73: * Copyright 2014 , Aricent Technologies (Holdings) Ltd
+        -:   74:***********************************************************************************/
+        -:   75:
+        -:   76:void receive_flag(int sd, int *flag)
+function receive_flag called 0 returned 0% blocks executed 0%
+    #####:   77:{
+    #####:   78:	LOGGER(LOG_CRITICAL,"Entered into receive_flag function");
+    #####:   79:	int iflag = 0, ret = 0;
+    #####:   80:	ret = read(sd, &iflag, sizeof(int));
+    #####:   81:	if(-1 == ret)
+        -:   82:	{
+    #####:   83:		ERROR_LOGGER(LOG_CRITICAL,"Read error");
+    #####:   84:		perror("Read error");
+    #####:   85:		exit(EXIT_FAILURE);
+        -:   86:	}
+    #####:   87:	*flag = ntohs(iflag);
+    #####:   88:	LOGGER(LOG_CRITICAL,"Exit from receive_flag function");
+        -:   89:}
+        -:   90:
+        -:   91:/***********************************************************************************
+        -:   92: * FUNCTION NAME : send_group_number
+        -:   93: 
+        -:   94: * DESCRIPTION 	 : Sends the group number chosen by the client, to the server.
+        -:   95: 
+        -:   96: * RETURNS 	 : void
+        -:   97:
+        -:   98: * Copyright 2014 , Aricent Technologies (Holdings) Ltd
+        -:   99:***********************************************************************************/
+        -:  100:
+        -:  101:void send_group_number(int sd, int num)
+function send_group_number called 0 returned 0% blocks executed 0%
+    #####:  102:{
+    #####:  103:	LOGGER(LOG_CRITICAL,"Entered into send_group_number function");
+    #####:  104:        int inum = 0, ret = 0;
+    #####:  105:        inum = htons(num);
+    #####:  106:        ret = write(sd, &inum, sizeof(int));
+    #####:  107:        if(-1 == ret)
+        -:  108:	{
+    #####:  109:		ERROR_LOGGER(LOG_CRITICAL,"Write error");
+    #####:  110:		perror("Write error");
+    #####:  111:                exit(EXIT_FAILURE);
+        -:  112:	}
+    #####:  113:	LOGGER(LOG_CRITICAL,"Exit from send_group_number function");
+        -:  114:}
+        -:  115:
+        -:  116:/***********************************************************************************
+        -:  117: * FUNCTION NAME : chat_read
+        -:  118: 
+        -:  119: * DESCRIPTION 	 : Reads all incoming messages from the server and messages sent by 
+        -:  120:		   other clients present in the same chat group. These messages are
+        -:  121:		   then printed on the client's screen.
+        -:  122:
+        -:  123: * RETURNS 	 : void*
+        -:  124:
+        -:  125: * Copyright 2014 , Aricent Technologies (Holdings) Ltd
+        -:  126:***********************************************************************************/
+        -:  127:
+        -:  128:void* chat_read(void* arg)
+function chat_read called 0 returned 0% blocks executed 0%
+    #####:  129:{
+    #####:  130:	LOGGER(LOG_CRITICAL,"Entered into chat_read function");
+    #####:  131:        int ret = 0, sd = 0;
+    #####:  132:        char buffer[MAX_DATA_LEN];
+        -:  133:	
+    #####:  134:        struct cnode *ptr = (struct cnode*)arg;
+    #####:  135:        sd = ptr->sd;
+        -:  136:	
+        -:  137:	//Initializing structure for signal handling
+    #####:  138:        struct sigaction sa;
+    #####:  139:        sa.sa_handler = &handle_signal;
+    #####:  140:        sa.sa_flags = SA_RESTART;
+    #####:  141:        sigfillset(&sa.sa_mask);
+        -:  142:
+    #####:  143:        if(-1 == sigaction(SIGINT, &sa, NULL))
+        -:  144:        {
+    #####:  145:	        ERROR_LOGGER(LOG_CRITICAL, "SIGNAL handling failed for SIGINT");
+    #####:  146:		perror("Error");
+    #####:  147:		exit(EXIT_FAILURE);
+        -:  148:	}
+        -:  149:
+    #####:  150:        if(-1 == sigaction(SIGTSTP, &sa, NULL))
+        -:  151:        {
+    #####:  152:	        ERROR_LOGGER(LOG_CRITICAL, "SIGNAL handling failed for SIGTSTP");
+    #####:  153:	        perror("Error");
+    #####:  154:		exit(EXIT_FAILURE);
+        -:  155:	}
+        -:  156:
+    #####:  157:	while(1)
+        -:  158:        {
+    #####:  159:                ret = read(sd, buffer, MAX_DATA_LEN);
+    #####:  160:		buffer[ret] = '\0';
+        -:  161:
+    #####:  162:                if(-1 == ret)
+        -:  163:		{
+    #####:  164:			ERROR_LOGGER(LOG_CRITICAL,"Write error");
+    #####:  165:			perror("Read error");
+    #####:  166:			exit(EXIT_FAILURE);
+        -:  167:                }
+    #####:  168:		if(0 == ret)
+        -:  169:		{
+    #####:  170:			close(sd);
+    #####:  171:			LOGGER(LOG_CRITICAL,"Exit from chat_read function");
+    #####:  172:			printf("Quitting..\n");
+    #####:  173:			exit(EXIT_SUCCESS);
+        -:  174://			pthread_exit(NULL);
+        -:  175:		}
+    #####:  176:                if(0 < ret)
+        -:  177:                {
+    #####:  178:			printf("%s\n", buffer);
+        -:  179:                }
+    #####:  180:	        bzero(buffer, MAX_DATA_LEN);
+        -:  181:        }
+        -:  182:	LOGGER(LOG_CRITICAL,"Exit from chat_read function");
+        -:  183:}
+        -:  184:
+        -:  185:/***********************************************************************************
+        -:  186: * FUNCTION NAME : chat_write
+        -:  187: 
+        -:  188: * DESCRIPTION 	 : This functions allows a client to type in messages to be sent to 
+        -:  189:		   other clients present in the chat group. If the client enters 'quit'
+        -:  190:		   , it exits the chat.
+        -:  191:
+        -:  192: * RETURNS 	 : void*
+        -:  193:
+        -:  194: * Copyright 2014 , Aricent Technologies (Holdings) Ltd
+        -:  195:***********************************************************************************/
+        -:  196:
+        -:  197:void* chat_write(void* arg)
+function chat_write called 0 returned 0% blocks executed 0%
+    #####:  198:{
+    #####:  199:	LOGGER(LOG_CRITICAL,"Entered into chat_write function");
+    #####:  200:        int ret = 0, sd = 0;
+    #####:  201:        char buffer[MAX_DATA_LEN];
+    #####:  202:	int g_number = 0;
+        -:  203:
+    #####:  204:        struct cnode *ptr = (struct cnode*)arg;
+    #####:  205:        sd = ptr->sd;
+    #####:  206:	g_number = ptr->g_number;
+        -:  207:
+        -:  208:	//Sending the group number to server
+    #####:  209:	send_group_number(sd, g_number);
+        -:  210:
+    #####:  211:	printf("Chat session (enter 'quit' to exit) :");
+        -:  212:
+    #####:  213:        while(1)
+        -:  214:        {
+    #####:  215:		printf("\n");
+    #####:  216:                fgets(buffer, MAX_DATA_LEN, stdin);
+    #####:  217:                buffer[strlen(buffer) - 1] = '\0';
+        -:  218:
+    #####:  219:                if(strlen(buffer) > (MAX_DATA_LEN - 1))
+        -:  220:                {
+    #####:  221:                        printf("Buffer size full,\t enter within %d characters\n", MAX_DATA_LEN);
+    #####:  222:                        bzero(buffer, MAX_DATA_LEN);
+    #####:  223:                        __fpurge(stdin);
+        -:  224:                }
+        -:  225:
+    #####:  226:                ret = write(sd ,buffer, strlen(buffer));
+    #####:  227:		if(-1 == ret)
+        -:  228:		{
+    #####:  229:	        	ERROR_LOGGER(LOG_CRITICAL, "Write error");
+    #####:  230:			perror("Write error");
+    #####:  231:			exit(EXIT_FAILURE);
+        -:  232:		}
+        -:  233:   
+    #####:  234:                if(0 == strcmp(buffer, "quit"))
+        -:  235:                {
+    #####:  236:			close(sd);
+    #####:  237:			LOGGER(LOG_CRITICAL,"Exit from chat_write function");  
+    #####:  238:			printf("Quitting..\n");
+        -:  239://		        pthread_exit(NULL);
+    #####:  240:			exit(EXIT_SUCCESS);
+        -:  241:		}
+    #####:  242:                bzero(buffer, MAX_DATA_LEN);
+        -:  243:        }//while ends
+        -:  244:	LOGGER(LOG_CRITICAL,"Exit from chat_write function");  
+        -:  245:}
+        -:  246:

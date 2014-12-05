@@ -1,0 +1,234 @@
+        -:    0:Source:../src/client_main.c
+        -:    0:Graph:client_main.gcno
+        -:    0:Data:client_main.gcda
+        -:    0:Runs:1
+        -:    0:Programs:2
+        -:    1:/***********************************************************************************
+        -:    2: * FILE NAME	: client_main.c
+        -:    3:
+        -:    4: * DESCRIPTION 	: File contains the main function of the client program which connects
+        -:    5:                 to the server for a chat session.
+        -:    6:
+        -:    7:        DATE            NAME            REFERENCE               REASON
+        -:    8:      23/Nov/14         TH6_GR_07                               Project
+        -:    9:
+        -:   10: * Copyright 2014 , Aricent Technologies (Holdings) Ltd
+        -:   11:************************************************************************************/
+        -:   12:
+        -:   13:#include "client_header.h"
+        -:   14:#include "logger.h"
+        -:   15:
+        -:   16:/***********************************************************************************
+        -:   17: * FUNCTION NAME : main
+        -:   18:
+        -:   19: * DESCRIPTION 	 : Establishes a client connection with the server, provides for
+        -:   20:                   registration/sign-in with a username and password, allows client to
+        -:   21:                   enter into a particular group, and then creates seperate threads for
+        -:   22:                   reading and writing messages concurrently.
+        -:   23:
+        -:   24: * RETURNS       : integer(0 on success, 1 on failure)
+        -:   25:
+        -:   26: * Copyright 2014 , Aricent Technologies (Holdings) Ltd
+        -:   27:***********************************************************************************/
+        -:   28:
+        -:   29:int main(int argc, char* argv[])
+function main called 1 returned 100% blocks executed 11%
+        1:   30:{
+        1:   31:        int sock_desc = 0, ch = 0, ret = 0, flag = 0, verify = 0, count = 0;
+        1:   32:        char y = 0;
+        1:   33:        char username[MAX_NAME_LEN];
+        1:   34:        char password[MAX_PASSWORD_LEN], tpassword[MAX_PASSWORD_LEN];
+        1:   35:        char buffer[MAX_DATA_LEN];
+        1:   36:        struct sockaddr_in server;
+        1:   37:        pthread_t t_read, t_write;
+        1:   38:        CNODE arg;
+        -:   39:
+        1:   40:        if(2 > argc)
+        -:   41:        {
+    #####:   42:		LOGGER(LOG_CRITICAL,"Enter server IP");
+    #####:   43:                printf("Enter server IP\n");
+    #####:   44:                return EXIT_SUCCESS;
+        -:   45:        }
+        -:   46:
+        1:   47:        sock_desc = socket(AF_INET, SOCK_STREAM, 0);
+        1:   48:        if(0 > sock_desc)
+        -:   49:        {
+    #####:   50:		ERROR_LOGGER(LOG_CRITICAL,"Couldn't create socket");
+    #####:   51:                perror("Couldn't create socket");
+    #####:   52:                return EXIT_FAILURE;
+        -:   53:        }
+        -:   54:
+        1:   55:        memset(&server, 0, sizeof(server));
+        1:   56:        server.sin_family = AF_INET;
+        1:   57:        server.sin_addr.s_addr = inet_addr(argv[1]);
+        1:   58:        server.sin_port = htons(PORT);
+        1:   59:        printf("Enter your name : ");
+        1:   60:        fgets(username, MAX_NAME_LEN, stdin);
+        1:   61:        username[strlen(username) - 1] = '\0';
+        1:   62:	if(connect(sock_desc, (struct sockaddr*)&server, sizeof(server)) < 0)
+        -:   63:        {
+        1:   64:		ERROR_LOGGER(LOG_CRITICAL,"Connection error");
+        1:   65:                perror("Connection error");
+        1:   66:                return EXIT_FAILURE;
+        -:   67:        }
+    #####:   68:        printf("\n%s connected to server\n\n", username);
+    #####:   69:        ret = write(sock_desc, username, strlen(username));
+    #####:   70:        if(-1 == ret)
+        -:   71:        {
+    #####:   72:		ERROR_LOGGER(LOG_CRITICAL,"Write error");		
+    #####:   73:                perror("Write error");
+    #####:   74:                return EXIT_FAILURE;
+        -:   75:        }
+        -:   76:
+        -:   77:        //Receive flag to check if the user is registered or not
+    #####:   78:        receive_flag(sock_desc, &flag);
+        -:   79:
+    #####:   80:        if(NEW_USER == flag)
+        -:   81:        {
+    #####:   82:                printf("You are not a registered user. To register, sign up with a password\n\n");
+    #####:   83:                printf("Enter password(MAX 16 characters) : ");
+    #####:   84:                scanf("%s", password);
+    #####:   85:                printf("\n");
+        -:   86:
+    #####:   87:        pass:   printf("Re-enter password : ");
+    #####:   88:                scanf("%s", tpassword);
+    #####:   89:                printf("\n");
+        -:   90:
+    #####:   91:                if(0 == strcmp(password, tpassword))
+        -:   92:                {
+    #####:   93:                        printf("Registration successful\n\n");
+        -:   94:                        //Now send password to server
+    #####:   95:                        ret = write(sock_desc, password, strlen(password));
+    #####:   96:                        if(-1 == ret)
+        -:   97:                        {
+    #####:   98:				ERROR_LOGGER(LOG_CRITICAL,"Write error");
+    #####:   99:                                perror("Write error");
+    #####:  100:                                return EXIT_FAILURE;
+        -:  101:                        }
+        -:  102:                }
+        -:  103:                else
+        -:  104:                {
+    #####:  105:                        printf("Enter correct password\n\n");
+    #####:  106:                        goto pass;
+        -:  107:                }
+        -:  108:        }
+    #####:  109:        if(REGISTERED_USER == flag)
+        -:  110:        {
+    #####:  111:        ver:    printf("Enter password : ");
+    #####:  112:                scanf("%s", password);
+    #####:  113:                printf("\n");
+        -:  114:                //Send password to server
+    #####:  115:                ret = write(sock_desc, password, strlen(password));
+    #####:  116:                if(-1 == ret)
+        -:  117:                {
+    #####:  118:			ERROR_LOGGER(LOG_CRITICAL,"Write error");
+    #####:  119:                        perror("Write error");
+    #####:  120:                        return EXIT_FAILURE;
+        -:  121:                }
+    #####:  122:                receive_flag(sock_desc, &verify);
+    #####:  123:                if(INCORRECT_PASSWORD == verify)
+        -:  124:                {
+    #####:  125:				count++;
+    #####:  126:                                send_flag(sock_desc, count);
+    #####:  127:                                if(MAX_LOGIN_ATTEMPTS == count)
+        -:  128:                                {
+    #####:  129:					ERROR_LOGGER(LOG_CRITICAL, "Login attempt failed");
+    #####:  130:                                        printf("Login attempt failed, exit.\n\n");
+    #####:  131:					close(sock_desc);
+    #####:  132:                                        exit(EXIT_FAILURE);
+        -:  133:                                }
+    #####:  134:                                printf("Incorrect password, enter again. \n");
+    #####:  135:                                goto ver;
+        -:  136:                }
+    #####:  137:                else goto jmp;
+        -:  138:        }
+        -:  139:
+    #####:  140:        jmp:    printf("List of available chat rooms :\n\n1. Chat room A\n2. Chat room B\n3. Chat room C\n4. Chat room D\n5. Chat room E\n\n");
+    #####:  141:                printf("Enter your choice : ");
+    #####:  142:                scanf("%d", &ch);
+    #####:  143:                printf("\n");
+    #####:  144:                switch(ch)
+        -:  145:                {
+        -:  146:                        case 1:
+        -:  147:                        case 2:
+        -:  148:                        case 3:
+        -:  149:                        case 4:
+        -:  150:                        case 5:
+    #####:  151:                                send_group_number(sock_desc, ch);
+    #####:  152:                                break;
+        -:  153:                        default:
+    #####:  154:                                printf("Invalid choice\n\n");
+    #####:  155:                                goto jmp;
+        -:  156:                }
+        -:  157:        //Receiving the list of online clients
+    #####:  158:        ret = read(sock_desc, buffer, MAX_DATA_LEN);
+    #####:  159:        if(-1 == ret)
+        -:  160:        {
+    #####:  161:		ERROR_LOGGER(LOG_CRITICAL,"Read Error");
+    #####:  162:                perror("Read error");
+    #####:  163:                return EXIT_FAILURE;
+        -:  164:        }
+    #####:  165:        buffer[ret] = '\0';
+        -:  166:
+        -:  167:        //Printing the list of online clients
+    #####:  168:        printf("Online clients :\n");
+    #####:  169:        printf("%s\n\n", buffer);
+        -:  170:
+    #####:  171:join:   printf("Do you want to join this group? (y/n) (Enter 'q' to exit) : ");
+    #####:  172:        y = getc(stdin);
+    #####:  173:        y = getc(stdin);
+    #####:  174:        printf("\n");
+        -:  175:
+    #####:  176:        switch(y)
+        -:  177:        {
+        -:  178:                case 'y':
+    #####:  179:                        flag = CONFIRMED;
+    #####:  180:                        send_flag(sock_desc, flag);
+    #####:  181:                        break;
+        -:  182:                case 'n':
+    #####:  183:                        flag = NOT_CONFIRMED;
+    #####:  184:                        send_flag(sock_desc, flag);
+    #####:  185:                        goto jmp;
+        -:  186:                        break;
+        -:  187: 		case 'q':
+    #####:  188:                        flag = QUIT;
+    #####:  189:                        send_flag(sock_desc, flag);
+    #####:  190:                        printf("Quitting..\n");
+    #####:  191:                        close(sock_desc);
+    #####:  192:                        exit(EXIT_SUCCESS);
+    #####:  193:                        break;
+        -:  194:                default:
+    #####:  195:			ERROR_LOGGER(LOG_CRITICAL,"Invalid choice");
+    #####:  196:                        printf("Invalid choice, enter either y/n.\n\n");
+    #####:  197:                        goto join;
+        -:  198:        }
+    #####:  199:        printf("You successfully joined the group\n\n");
+        -:  200:
+        -:  201:        //Initializing the structure to be passed to the read & write threads
+    #####:  202:        arg.sd = sock_desc;
+    #####:  203:        strcpy(arg.username, username);
+    #####:  204:        arg.g_number = ch;
+        -:  205:
+    #####:  206:        ret = pthread_create(&t_write, NULL, chat_write, (void*)&arg);
+    #####:  207:        if(0 != ret)
+        -:  208:        {
+    #####:  209:		ERROR_LOGGER(LOG_CRITICAL,"Thread create error");
+    #####:  210:                perror("Thread create error");
+    #####:  211:                return EXIT_FAILURE;
+        -:  212:        }
+        -:  213:
+    #####:  214:        ret = pthread_create(&t_read, NULL, chat_read, (void*)&arg);
+    #####:  215:        if(0 != ret)
+        -:  216:        {
+    #####:  217:		ERROR_LOGGER(LOG_CRITICAL,"Thread create error");
+    #####:  218:                perror("Thread create error");
+    #####:  219:                return EXIT_FAILURE;
+        -:  220:        }
+        -:  221:
+    #####:  222:        pthread_join(t_write, NULL);
+    #####:  223:        pthread_join(t_read, NULL);
+        -:  224:
+    #####:  225:        close(sock_desc);
+    #####:  226:        return EXIT_SUCCESS;
+        -:  227:}
+        -:  228:

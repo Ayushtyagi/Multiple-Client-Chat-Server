@@ -1,0 +1,641 @@
+        -:    0:Source:../src/server_functions.c
+        -:    0:Graph:server_functions.gcno
+        -:    0:Data:server_functions.gcda
+        -:    0:Runs:1
+        -:    0:Programs:3
+        -:    1:/***********************************************************************************
+        -:    2: * FILE NAME   : mpcc_server_functions.c
+        -:    3:
+        -:    4: * DESCRIPTION : This file contains functions which implement all the functionalities
+        -:    5:                 of the server.
+        -:    6:
+        -:    7:        DATE            NAME            REFERENCE               REASON
+        -:    8:      23/Nov/14       TH6_GR_07                                 Project
+        -:    9:
+        -:   10: * Copyright 2014 , Aricent Technologies (Holdings) Ltd
+        -:   11:***********************************************************************************/
+        -:   12:
+        -:   13:#include "server_header.h"
+        -:   14:#include "logger.h"
+        -:   15:
+        -:   16:/***********************************************************************************
+        -:   17: * FUNCTION NAME : authenticate_client
+        -:   18:
+        -:   19: * DESCRIPTION 	 : Checks whether a client is a registered user or a new user.
+        -:   20:
+        -:   21: * RETURNS       : integer
+        -:   22:
+        -:   23: * Copyright 2014 , Aricent Technologies (Holdings) Ltd
+        -:   24:***********************************************************************************/
+        -:   25:
+        -:   26:int authenticate_client(FILE* repository, char* username)
+function authenticate_client called 0 returned 0% blocks executed 0%
+    #####:   27:{
+    #####:   28:	LOGGER(LOG_CRITICAL,"Entered into authenticate_client function");
+    #####:   29:        char buffer[MAX_NAME_LEN];
+    #####:   30:        repository = fopen("repository", "r");
+    #####:   31:        if(NULL == repository)
+        -:   32:        {	
+    #####:   33:		ERROR_LOGGER(LOG_CRITICAL,"Error opening repository");
+    #####:   34:                perror("Error opening repository");
+    #####:   35:                exit(EXIT_FAILURE);
+        -:   36:        }
+    #####:   37:        while(NULL != fgets(buffer, MAX_NAME_LEN, repository))
+        -:   38:        {
+    #####:   39:                buffer[strlen(buffer) - 1] = '\0';
+    #####:   40:                if(0 == strcmp(username, buffer))
+        -:   41:                {
+    #####:   42:                        fclose(repository);
+    #####:   43:			LOGGER(LOG_CRITICAL,"Exit from authenticate_client function");        
+    #####:   44:                        return REGISTERED_USER;
+        -:   45:                }
+        -:   46:        }
+    #####:   47:        fclose(repository);
+    #####:   48:	LOGGER(LOG_CRITICAL,"Exit from authenticate_client function");        
+    #####:   49:	return NEW_USER;
+        -:   50:}
+        -:   51:
+        -:   52:/***********************************************************************************
+        -:   53: * FUNCTION NAME : insert_into_logfile
+        -:   54:
+        -:   55: * DESCRIPTION : Writes the log buffer into the log file.
+        -:   56:
+        -:   57: * RETURNS : void
+        -:   58:
+        -:   59: * Copyright 2014 , Aricent Technologies (Holdings) Ltd
+        -:   60:***********************************************************************************/
+        -:   61:void insert_into_logfile(FILE* fp, char* buffer)
+function insert_into_logfile called 0 returned 0% blocks executed 0%
+    #####:   62:{
+    #####:   63:	LOGGER(LOG_CRITICAL,"Entered into insert_into_logfile function");
+    #####:   64:        fp = fopen("log_file", "a");
+    #####:   65:        if(NULL == fp)
+        -:   66:        {
+    #####:   67:		ERROR_LOGGER(LOG_CRITICAL,"Error opening log file");
+    #####:   68:                perror("Error opening log file");
+    #####:   69:                exit(EXIT_FAILURE);
+        -:   70:        }
+    #####:   71:        fputs(buffer, fp);
+    #####:   72:        fclose(fp);
+    #####:   73:	LOGGER(LOG_CRITICAL,"Exit from insert_into_logfile function");
+        -:   74:}
+        -:   75:
+        -:   76:/***********************************************************************************
+        -:   77: * FUNCTION NAME : insert_into_repository
+        -:   78:
+        -:   79: * DESCRIPTION 	 : Writes the username of a client into the repository.
+        -:   80:
+        -:   81: * RETURNS 	 : void
+        -:   82:
+        -:   83: * Copyright 2014 , Aricent Technologies (Holdings) Ltd
+        -:   84:***********************************************************************************/
+        -:   85:
+        -:   86:void insert_into_repository(FILE* repository, char* username)
+function insert_into_repository called 0 returned 0% blocks executed 0%
+    #####:   87:{
+    #####:   88:	LOGGER(LOG_CRITICAL,"Entered into insert_into_repository function");
+    #####:   89:        repository = fopen("repository", "a");
+    #####:   90:        if(NULL == repository)
+        -:   91:        {
+    #####:   92:		ERROR_LOGGER(LOG_CRITICAL,"Error opening repository");
+    #####:   93:                perror("Error opening repository");
+    #####:   94:                exit(EXIT_FAILURE);
+        -:   95:        }
+    #####:   96:        fprintf(repository, "%s\n", username);
+    #####:   97:        fclose(repository);
+    #####:   98:	LOGGER(LOG_CRITICAL,"Exit from insert_into_repository function");
+        -:   99:}
+        -:  100:
+        -:  101:/***********************************************************************************
+        -:  102: * FUNCTION NAME : insert_into_registry
+        -:  103:
+        -:  104: * DESCRIPTION 	 : Writes the username & password (key) of a client into the repository.
+        -:  105:
+        -:  106: * RETURNS 	 : void
+        -:  107:
+        -:  108: * Copyright 2014 , Aricent Technologies (Holdings) Ltd
+        -:  109:***********************************************************************************/
+        -:  110:
+        -:  111:void insert_into_registry(FILE* registry, char* key)
+function insert_into_registry called 0 returned 0% blocks executed 0%
+    #####:  112:{
+    #####:  113:	LOGGER(LOG_CRITICAL,"Entered into insert_into_registry function");
+    #####:  114:        registry = fopen("registry", "a");
+    #####:  115:        if(NULL == registry)
+        -:  116:        {
+    #####:  117:		ERROR_LOGGER(LOG_CRITICAL,"Error opening registry");
+    #####:  118:                perror("Error opening registry");
+    #####:  119:                exit(EXIT_FAILURE);
+        -:  120:        }
+    #####:  121:        fprintf(registry, "%s\n", key);
+    #####:  122:        fclose(registry);
+    #####:  123:	LOGGER(LOG_CRITICAL,"Exit from insert_into_registry function");
+        -:  124:}
+        -:  125:
+        -:  126:/***********************************************************************************
+        -:  127: * FUNCTION NAME : verify_password
+        -:  128:
+        -:  129: * DESCRIPTION 	 : Verifies the password entered by a user.
+        -:  130:
+        -:  131: * RETURNS 	 : integer
+        -:  132:
+        -:  133: * Copyright 2014 , Aricent Technologies (Holdings) Ltd
+        -:  134:***********************************************************************************/
+        -:  135:
+        -:  136:int verify_password(FILE* registry, char* key)
+function verify_password called 0 returned 0% blocks executed 0%
+    #####:  137:{
+    #####:  138:	LOGGER(LOG_CRITICAL,"Entered into verify_password function");
+    #####:  139:	char buffer[MAX_KEY_LEN];
+        -:  140:	
+    #####:  141:	registry = fopen("registry", "r");        
+    #####:  142:	if(NULL == registry)
+        -:  143:	{
+    #####:  144:		ERROR_LOGGER(LOG_CRITICAL, "Error opening registry");
+    #####:  145:		perror("Error opening registry");
+    #####:  146:		exit(EXIT_FAILURE);
+        -:  147:	}
+        -:  148:        
+    #####:  149:	while(fgets(buffer, MAX_KEY_LEN, registry) != NULL)
+        -:  150:        {
+    #####:  151:                buffer[strlen(buffer) - 1] = '\0';
+    #####:  152:                if(0 == strcmp(key, buffer))
+        -:  153:                {
+    #####:  154:			LOGGER(LOG_CRITICAL,"Exit from verify_password function");
+    #####:  155:                        fclose(registry);
+    #####:  156:			return CORRECT_PASSWORD;
+        -:  157:                }
+        -:  158:        }
+    #####:  159:	LOGGER(LOG_CRITICAL,"Exit from verify_password function");
+    #####:  160:	fclose(registry);
+    #####:  161:        return INCORRECT_PASSWORD;
+        -:  162:}
+        -:  163:
+        -:  164:/***********************************************************************************
+        -:  165: * FUNCTION NAME : handle_signal
+        -:  166:
+        -:  167: * DESCRIPTION : Handles the SIGTSTP and SIGINT signals
+        -:  168:
+        -:  169: * RETURNS : void
+        -:  170:
+        -:  171: * Copyright 2014 , Aricent Technologies (Holdings) Ltd
+        -:  172:***********************************************************************************/
+        -:  173:
+        -:  174:void handle_signal(int signal)
+function handle_signal called 1 returned 0% blocks executed 53%
+        1:  175:{
+        1:  176:	LOGGER(LOG_CRITICAL,"Entered into handle_signal function");
+        1:  177:        int ret = 0, i = 0;
+        1:  178:        NODE *cur = NULL;
+        1:  179:        char* msg = "Server shutdown\n\n";
+        1:  180:        ret = write(1, msg, strlen(msg));
+        1:  181:        if(ret == -1)
+        -:  182:        {
+    #####:  183:		ERROR_LOGGER(LOG_CRITICAL,"Write error");
+    #####:  184:                perror("Write error");
+    #####:  185:                exit(EXIT_FAILURE);
+        -:  186:        }
+        1:  187:        msg = "Server down, closing clients..\n\nDue to some unexpected reason, the server has shut down, exit.\n";
+        6:  188:        for(i = 0;i < MAX_GROUPS;i++)
+        -:  189:        {
+        5:  190:                cur = group[i];
+        5:  191:                while(cur != NULL)
+        -:  192:                {
+    #####:  193:                        ret = write(cur->sd, msg, strlen(msg));
+    #####:  194:                        if(ret == -1)
+        -:  195:                        {
+    #####:  196:				ERROR_LOGGER(LOG_CRITICAL,"Write error");
+    #####:  197:                                perror("Write error");
+    #####:  198:                                exit(EXIT_FAILURE);
+        -:  199:                        }
+    #####:  200:                        cur = cur->next;
+        -:  201:
+        -:  202:                }
+        -:  203:        }
+        1:  204:	LOGGER(LOG_CRITICAL,"Exit from handle_signal function");
+        1:  205:        exit(EXIT_SUCCESS);
+        -:  206:}
+        -:  207:
+        -:  208:/***********************************************************************************
+        -:  209: * FUNCTION NAME : receive_flag
+        -:  210:
+        -:  211: * DESCRIPTION : Receives a flag/integer from the client.
+        -:  212:
+        -:  213: * RETURNS : void
+        -:  214:
+        -:  215: * Copyright 2014 , Aricent Technologies (Holdings) Ltd
+        -:  216:***********************************************************************************/
+        -:  217:
+        -:  218:void receive_flag(int sd, int *flag)
+function receive_flag called 0 returned 0% blocks executed 0%
+    #####:  219:{
+    #####:  220:	LOGGER(LOG_CRITICAL,"Entered into receive_flag function");
+    #####:  221:        int iflag = 0, ret = 0;
+    #####:  222:        ret = read(sd, &iflag, sizeof(int));
+    #####:  223:        if(ret == -1)
+        -:  224:        {
+    #####:  225:		ERROR_LOGGER(LOG_CRITICAL,"Read error");
+    #####:  226:                perror("Read error");
+    #####:  227:                exit(EXIT_FAILURE);
+        -:  228:        }
+    #####:  229:        *flag = ntohs(iflag);
+    #####:  230:	LOGGER(LOG_CRITICAL,"Exit from receive_flag function");
+        -:  231:}
+        -:  232:
+        -:  233:/***********************************************************************************
+        -:  234: * FUNCTION NAME : send_flag
+        -:  235:
+        -:  236: * DESCRIPTION : Sends a flag/integer to the client.
+        -:  237:
+        -:  238: * RETURNS : void
+        -:  239:
+        -:  240: * Copyright 2014 , Aricent Technologies (Holdings) Ltd
+        -:  241:***********************************************************************************/
+        -:  242:
+        -:  243:void send_flag(int sd, int flag)
+function send_flag called 0 returned 0% blocks executed 0%
+    #####:  244:{
+    #####:  245:	LOGGER(LOG_CRITICAL,"Entered into send_flag function");
+    #####:  246:        int iflag = 0, ret = 0;
+    #####:  247:        iflag = htons(flag);
+    #####:  248:        ret = write(sd, &iflag, sizeof(int));
+    #####:  249:        if(ret == -1)
+        -:  250:        {
+    #####:  251:		ERROR_LOGGER(LOG_CRITICAL,"Write error");
+    #####:  252:                perror("Write error");
+    #####:  253:                exit(EXIT_FAILURE);
+        -:  254:        }
+    #####:  255:	LOGGER(LOG_CRITICAL,"Exit from send_flag function");   
+        -:  256:}
+        -:  257:
+        -:  258:/***********************************************************************************
+        -:  259: * FUNCTION NAME : receive_group_number
+        -:  260:
+        -:  261: * DESCRIPTION : Receives the group number chosen by the client.
+        -:  262:
+        -:  263: * RETURNS : void
+        -:  264:
+        -:  265: * Copyright 2014 , Aricent Technologies (Holdings) Ltd
+        -:  266:***********************************************************************************/
+        -:  267:
+        -:  268:void receive_group_number(int sd, int* num)
+function receive_group_number called 0 returned 0% blocks executed 0%
+    #####:  269:{
+    #####:  270:	LOGGER(LOG_CRITICAL,"Entered into receive_group_number function");
+    #####:  271:        int inum = 0, ret = 0;
+    #####:  272:        ret = read(sd, &inum, sizeof(int));
+    #####:  273:        if(ret == -1)
+        -:  274:        {
+    #####:  275:		ERROR_LOGGER(LOG_CRITICAL,"Read error");
+    #####:  276:                perror("Read error");
+    #####:  277:                exit(EXIT_FAILURE);
+        -:  278:        }
+    #####:  279:        *num = ntohs(inum);
+    #####:  280:	LOGGER(LOG_CRITICAL,"Exit from receive_group_number function");
+        -:  281:}
+        -:  282:
+        -:  283:/***********************************************************************************
+        -:  284: * FUNCTION NAME : notify_clients
+        -:  285:
+        -:  286: * DESCRIPTION : Broadcasts a message to all clients in a group.
+        -:  287:
+        -:  288: * RETURNS : void
+        -:  289:
+        -:  290: * Copyright 2014 , Aricent Technologies (Holdings) Ltd
+        -:  291:***********************************************************************************/
+        -:  292:
+        -:  293:void notify_clients(NODE* first, int sd, char* buffer)
+function notify_clients called 0 returned 0% blocks executed 0%
+    #####:  294:{
+    #####:  295:	LOGGER(LOG_CRITICAL,"Entered into notify_clients function");
+    #####:  296:        int ret = 0;
+    #####:  297:	NODE* cur = NULL;
+    #####:  298:        if(first == NULL)
+    #####:  299:                return;
+    #####:  300:        cur = first;
+    #####:  301:        while(cur != NULL)
+        -:  302:        {
+    #####:  303:                if(sd != cur->sd)
+        -:  304:		{
+    #####:  305:                        ret = write(cur->sd, buffer, strlen(buffer));
+    #####:  306:			if(ret == -1)
+        -:  307:			{
+    #####:  308:				ERROR_LOGGER(LOG_CRITICAL,"Write error");
+    #####:  309:				perror("Write error");
+    #####:  310:				exit(EXIT_FAILURE);
+        -:  311:			}
+        -:  312:		}
+    #####:  313:                cur = cur->next;
+        -:  314:        }
+    #####:  315:	LOGGER(LOG_CRITICAL,"Exit from notify_clients function");
+        -:  316:}
+        -:  317:
+        -:  318:/***********************************************************************************
+        -:  319: * FUNCTION NAME : insert
+        -:  320:
+        -:  321: * DESCRIPTION : Inserts a new client into a group.
+        -:  322:
+        -:  323: * RETURNS : NODE* (first/head node of the group)
+        -:  324:
+        -:  325: * Copyright 2014 , Aricent Technologies (Holdings) Ltd
+        -:  326:***********************************************************************************/
+        -:  327:
+        -:  328:NODE* insert(NODE *first, int sd, char* username)
+function insert called 0 returned 0% blocks executed 0%
+    #####:  329:{
+    #####:  330:        LOGGER(LOG_CRITICAL,"Entered into insert function");
+    #####:  331:        NODE *temp = NULL;
+    #####:  332:        temp = malloc(sizeof(struct node));
+    #####:  333:        if(temp == NULL)
+        -:  334:        {
+    #####:  335:		ERROR_LOGGER(LOG_CRITICAL,"Malloc error");
+    #####:  336:                perror("Memory not available");
+    #####:  337:                return first;
+        -:  338:        }
+    #####:  339:        temp->sd = sd;
+    #####:  340:        strcpy(temp->username, username);
+    #####:  341:        temp->next = first;
+    #####:  342:        LOGGER(LOG_CRITICAL,"Exit from insert function");
+    #####:  343:        return temp;
+        -:  344:}
+        -:  345:
+        -:  346:/***********************************************************************************
+        -:  347: * FUNCTION NAME : thread_server
+        -:  348:
+        -:  349: * DESCRIPTION : Each thread_server function recieves messages sent by a client
+        -:  350:                 and broadcasts it all clients in a group. If the message is a
+        -:  351:                 'quit' request, it deletes the client from the group, notifies other
+        -:  352:                 clients that the user has left the chat, and updates the log file.
+        -:  353:
+        -:  354: * RETURNS : void*
+        -:  355:
+        -:  356: * Copyright 2014 , Aricent Technologies (Holdings) Ltd
+        -:  357:***********************************************************************************/
+        -:  358:
+        -:  359:void* thread_server(void *arg)
+function thread_server called 0 returned 0% blocks executed 0%
+    #####:  360:{
+    #####:  361:        LOGGER(LOG_CRITICAL,"Entered into thread_server function");
+    #####:  362:        int sd = 0, ret = 0, ch = 0;
+    #####:  363:        char username[MAX_NAME_LEN], buffer[MAX_DATA_LEN];
+    #####:  364:        struct node *ptr = (struct node*)arg;
+    #####:  365:        char *timestamp = NULL;
+    #####:  366:        char log_buffer[MAX_DATA_LEN];
+    #####:  367:        pthread_mutex_t mutex = PTHREAD_MUTEX_INITIALIZER;
+    #####:  368:	char *strp = NULL;
+    #####:  369:        char final_msg[MAX_DATA_LEN];
+    #####:  370:	char *msg = malloc(MAX_DATA_LEN);
+    #####:  371:	if(msg == NULL)
+        -:  372:	{
+    #####:  373:		ERROR_LOGGER(LOG_CRITICAL,"Malloc error");
+    #####:  374:		perror("Malloc error");
+    #####:  375:		exit(EXIT_FAILURE);
+        -:  376:	}
+    #####:  377:        sd = ptr->sd;
+    #####:  378:        strcpy(username, ptr->username);
+        -:  379:
+    #####:  380:        receive_group_number(sd, &ch);
+        -:  381:
+        -:  382:        //Start chatting
+    #####:  383:        while(1)
+        -:  384:        {
+    #####:  385:                ret = read(sd, buffer, MAX_DATA_LEN);
+    #####:  386:                buffer[ret] = '\0';
+        -:  387:
+    #####:  388:                if(ret == 0)
+    #####:  389:                        goto jmp;
+        -:  390:                //If a client quits
+    #####:  391:                if(strncmp(buffer, "quit", 4) == 0)
+        -:  392:                {
+    #####:  393:                jmp:    printf("%d -> %s leaving chat, deleting from list\n", sd, username);
+        -:  394:                        //bzero(buffer, MAX_DATA_LEN);
+    #####:  395:                        timestamp = get_timestamp();
+    #####:  396:                        timestamp[strlen(timestamp) - 1] = '\0';
+    #####:  397:                        sprintf(log_buffer, "%s : %s has left the chat\n\n", timestamp, username);
+        -:  398:
+    #####:  399:                        free(timestamp);
+        -:  400:
+        -:  401:                        //Mutex lock, update log file
+    #####:  402:                        pthread_mutex_lock(&mutex);
+    #####:  403:                        fp = fopen("log_file", "a");
+    #####:  404:                        if(fp == NULL)
+        -:  405:                        {
+    #####:  406:				ERROR_LOGGER(LOG_CRITICAL, "Error opening log file");
+    #####:  407:                                perror("Error opening log file");
+    #####:  408:                                pthread_exit(NULL);
+        -:  409:                        }
+    #####:  410:                        fputs(log_buffer, fp);
+    #####:  411:                        bzero(log_buffer, MAX_DATA_LEN);
+    #####:  412:                        fclose(fp);
+        -:  413:                        //Mutex unlock
+    #####:  414:                        pthread_mutex_unlock(&mutex);
+        -:  415:
+    #####:  416:                        sprintf(buffer, "%s has left the chat\n", username);
+    #####:  417:                        notify_clients(group[ch - 1], sd, buffer);
+    #####:  418:                        bzero(buffer, MAX_DATA_LEN);
+    #####:  419:                        group[ch - 1] = delete_node(group[ch - 1], sd);
+    #####:  420:                        close(sd);
+    #####:  421:                        free(msg);
+    #####:  422:			LOGGER(LOG_CRITICAL,"Exit from thread_server function");
+    #####:  423:                        break;
+        -:  424:                }
+        -:  425:
+    #####:  426:                printf("%s : %s\n\n",username, buffer);
+        -:  427:
+    #####:  428:                strcpy(msg, username);
+    #####:  429:                strp = msg;
+    #####:  430:                strp += strlen(msg);
+    #####:  431:                strcat(strp, buffer);
+        -:  432:
+    #####:  433:                sprintf(final_msg, "%s : %s\n", username, strp);
+        -:  434:
+    #####:  435:                notify_clients(group[ch - 1], sd, final_msg);
+        -:  436:
+    #####:  437:                bzero(buffer, MAX_DATA_LEN);
+    #####:  438:                bzero(msg, MAX_DATA_LEN);
+    #####:  439:                bzero(final_msg, MAX_DATA_LEN);
+        -:  440:        }
+    #####:  441:	LOGGER(LOG_CRITICAL,"Exit from thread_server function");
+    #####:  442:        pthread_exit(NULL);
+        -:  443:}
+        -:  444:
+        -:  445:/***********************************************************************************
+        -:  446: * FUNCTION NAME : delete_node
+        -:  447:
+        -:  448: * DESCRIPTION : Removes a client/user from a particular group.
+        -:  449:
+        -:  450: * RETURNS : NODE* (first/head node of the group)
+        -:  451:
+        -:  452: * Copyright 2014 , Aricent Technologies (Holdings) Ltd
+        -:  453:***********************************************************************************/
+        -:  454:
+        -:  455:NODE* delete_node(NODE* first, int sd)
+function delete_node called 0 returned 0% blocks executed 0%
+    #####:  456:{
+    #####:  457:	LOGGER(LOG_CRITICAL,"Entered into delete_node function");
+    #####:  458:        NODE *prev = NULL, *cur = NULL;
+    #####:  459:        if(first == NULL)
+        -:  460:        {
+    #####:  461:                return first;
+        -:  462:        }
+    #####:  463:        if(first->next == NULL)
+        -:  464:        {
+    #####:  465:                if(sd == first->sd)
+        -:  466:                {
+    #####:  467:                        free(first);
+    #####:  468:                        return NULL;
+        -:  469:		}
+        -:  470:                else
+    #####:  471:                        return first;
+        -:  472:        }
+    #####:  473:        cur = first;
+    #####:  474:        while(cur != NULL)
+        -:  475:        {
+    #####:  476:                if(sd == first->sd)
+        -:  477:                {
+    #####:  478:                        first = first->next;
+    #####:  479:                        free(cur);
+    #####:  480:			break;
+        -:  481:                }
+    #####:  482:                prev = cur;
+    #####:  483:                cur = cur->next;
+    #####:  484:                if(sd == cur->sd)
+        -:  485:                {
+    #####:  486:                        prev->next = cur->next;
+    #####:  487:                        free(cur);
+        -:  488:			break;
+        -:  489:                }
+        -:  490:        }
+    #####:  491:	LOGGER(LOG_CRITICAL,"Exit from delete_node function");
+    #####:  492:        return first;
+        -:  493:}
+        -:  494:
+        -:  495:/***********************************************************************************
+        -:  496: * FUNCTION NAME : display
+        -:  497:
+        -:  498: * DESCRIPTION : Displays all the clients online in a particular group.
+        -:  499:
+        -:  500: * RETURNS : void
+        -:  501:
+        -:  502: * Copyright 2014 , Aricent Technologies (Holdings) Ltd
+        -:  503:***********************************************************************************/
+        -:  504:
+        -:  505:void display(NODE* first)
+function display called 0 returned 0% blocks executed 0%
+    #####:  506:{
+    #####:  507:	LOGGER(LOG_CRITICAL,"Entered into display function");
+    #####:  508:        NODE *cur = NULL;
+    #####:  509:        if(first == NULL)
+        -:  510:        {
+    #####:  511:                printf("No clients online\n");
+    #####:  512:		LOGGER(LOG_CRITICAL,"Exit from display function");
+    #####:  513:                return;
+        -:  514:        }
+    #####:  515:        cur = first;
+    #####:  516:        while(cur != NULL)
+        -:  517:        {
+    #####:  518:                printf("%d -> %s\t", cur->sd, cur->username);
+    #####:  519:                cur = cur->next;
+        -:  520:        }
+    #####:  521:        printf("\n");
+    #####:  522:	LOGGER(LOG_CRITICAL,"Exit from display function");
+        -:  523:}
+        -:  524:
+        -:  525:/***********************************************************************************
+        -:  526: * FUNCTION NAME : delete_list
+        -:  527:
+        -:  528: * DESCRIPTION : Removes all the clients from a particular group.
+        -:  529:
+        -:  530: * RETURNS : NODE*
+        -:  531:
+        -:  532: * Copyright 2014 , Aricent Technologies (Holdings) Ltd
+        -:  533:***********************************************************************************/
+        -:  534:
+        -:  535:NODE* delete_list(NODE* first)
+function delete_list called 0 returned 0% blocks executed 0%
+    #####:  536:{
+    #####:  537:	LOGGER(LOG_CRITICAL,"Enter into delete_list function");
+    #####:  538:        NODE *temp = NULL;
+    #####:  539:        if(first == NULL)
+        -:  540:	{
+    #####:  541:		LOGGER(LOG_CRITICAL,"Exit from delete_list function");
+    #####:  542:                return NULL;
+        -:  543:	}
+    #####:  544:        while(first != NULL)
+        -:  545:        {
+    #####:  546:                temp = first;
+    #####:  547:                first = first->next;
+    #####:  548:                free(temp);
+        -:  549:        }
+    #####:  550:	LOGGER(LOG_CRITICAL,"Exit from delete_list function");
+    #####:  551:        return NULL;
+        -:  552:}
+        -:  553:
+        -:  554:/***********************************************************************************
+        -:  555: * FUNCTION NAME : get_timestamp
+        -:  556:
+        -:  557: * DESCRIPTION : Returns the timestamp as a string
+        -:  558:
+        -:  559: * RETURNS : char*
+        -:  560:
+        -:  561: * Copyright 2014 , Aricent Technologies (Holdings) Ltd
+        -:  562:***********************************************************************************/
+        -:  563:
+        -:  564:char* get_timestamp()
+function get_timestamp called 0 returned 0% blocks executed 0%
+    #####:  565:{
+    #####:  566:	LOGGER(LOG_CRITICAL,"Enter into get_timestamp function");
+    #####:  567:        char *timestamp = NULL;
+    #####:  568:        time_t ltime;
+    #####:  569:        ltime = time(NULL);
+    #####:  570:        timestamp = strdup(asctime(localtime(&ltime)));
+    #####:  571:	LOGGER(LOG_CRITICAL,"Exit from get_timestamp function");
+    #####:  572:        return timestamp;
+        -:  573:}
+        -:  574:
+        -:  575:/***********************************************************************************
+        -:  576: * FUNCTION NAME : send_client_list
+        -:  577:
+        -:  578: * DESCRIPTION : Sends a list of online users in a particular group to the client.
+        -:  579:
+        -:  580: * RETURNS : void
+        -:  581:
+        -:  582: * Copyright 2014 , Aricent Technologies (Holdings) Ltd
+        -:  583:***********************************************************************************/
+        -:  584:
+        -:  585:void send_client_list(NODE* first, int sd)
+function send_client_list called 0 returned 0% blocks executed 0%
+    #####:  586:{
+    #####:  587:	LOGGER(LOG_CRITICAL,"Enter into send_client_list function");
+    #####:  588:        int ret = 0;
+    #####:  589:        NODE* cur = NULL;
+    #####:  590:        char buffer[MAX_DATA_LEN];
+    #####:  591:        char *msg = "No clients online";
+        -:  592:
+    #####:  593:        if(first == NULL)
+        -:  594:        {
+    #####:  595:                ret = write(sd, msg, strlen(msg));
+    #####:  596:                if(ret == -1)
+        -:  597:                {
+    #####:  598:			ERROR_LOGGER(LOG_CRITICAL,"Write error");
+    #####:  599:                        perror("Write error");
+    #####:  600:                        exit(EXIT_FAILURE);
+        -:  601:                }
+        -:  602:        }
+        -:  603:
+    #####:  604:        cur = first;
+    #####:  605:        while(cur != NULL)
+        -:  606:        {
+    #####:  607:                sprintf(buffer, "%s\t", cur->username);
+    #####:  608:                ret = write(sd, buffer, strlen(buffer));
+    #####:  609:                if(ret == -1)
+        -:  610:                {
+    #####:  611:			ERROR_LOGGER(LOG_CRITICAL,"Write error");
+    #####:  612:                        perror("Write error");
+    #####:  613:                        exit(EXIT_FAILURE);;
+        -:  614:                }
+    #####:  615:                cur = cur->next;
+        -:  616:        }
+    #####:  617:	LOGGER(LOG_CRITICAL,"Exit from send_client_list function");
+        -:  618:}
+        -:  619:
